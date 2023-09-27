@@ -6,7 +6,7 @@ using namespace std;
 
 int uniqueKey = 0;
 string names[] = {"Igor", "João", "Victor", "Iago", "Eric", "Isadora", "Nicole", "Gabriel"};
-char sexs[] = "MF";
+char sexs[] = {'M', 'F'};
 
 struct TItem
 {
@@ -20,6 +20,7 @@ struct TCell
 {
     TItem item;
     TCell *next;
+    TCell *previous;
 };
 
 struct TList
@@ -43,31 +44,77 @@ bool isEmpty(TList list)
 
 void appendToList(TList &list, TItem item)
 {
+    TCell *tempCell = list.last;
     list.last->next = new TCell;
     list.last = list.last->next;
     list.last->item = item;
     list.last->next = NULL;
+    list.last->previous = tempCell;
 }
 
-void showList(TList list)
+void prependToList(TList &list, TItem item)
+{
+    TCell *tempCell = list.first->next;
+    list.first->next = new TCell;
+    list.first->next->item = item;
+    list.first->next->next = tempCell;
+    list.first->next->next->previous = list.first->next;
+    list.first->next->previous = list.first;
+}
+
+void showList(TList list, bool debug)
 {
     if (isEmpty(list))
     {
         cout << "The list is empty." << endl;
         return;
     }
-    TCell cell = *list.first->next;
-    cout << " ===== showList ===== " << endl;
-    while (&cell != NULL)
+    TCell *cell = list.first->next;
+    cout << " ======== showList ======== " << endl;
+    while (cell != NULL)
     {
-        cout << "  id: " << cell.item.id << endl;
-        cout << "  name: " << cell.item.name << endl;
-        cout << "  sex: " << cell.item.sex << endl;
-        cout << "  age: " << cell.item.age << endl;
-        if (cell.next != NULL) { cout << " -------------------- " << endl; }
-        cell = *cell.next;
+        cout << "  id:   " << cell->item.id << endl;
+        cout << "  name: " << cell->item.name << endl;
+        cout << "  sex:  " << cell->item.sex << endl;
+        cout << "  age:  " << cell->item.age << endl;
+        if (debug)
+        {
+            cout << "  debug true (" << endl;
+            cout << "   prev: " << cell->previous << endl;
+            cout << "   ref:  " << cell << endl;
+            cout << "   next: " << cell->next << " )" << endl;
+        }
+        if (cell->next != NULL) { cout << " -------------------------- " << endl; }
+        cell = cell->next;
     }
-    cout << " ==================== " << endl;
+    cout << " ========================== " << endl;
+}
+
+void showStack(TList list, bool debug) {
+    if (isEmpty(list))
+    {
+        cout << "The list is empty." << endl;
+        return;
+    }
+    TCell *cell = list.last;
+    cout << " ======= showStack ======== " << endl;
+    while (cell != list.first)
+    {
+        cout << "  id:   " << cell->item.id << endl;
+        cout << "  name: " << cell->item.name << endl;
+        cout << "  sex:  " << cell->item.sex << endl;
+        cout << "  age:  " << cell->item.age << endl;
+        if (debug)
+        {
+            cout << "  debug true (" << endl;
+            cout << "   prev: " << cell->previous << endl;
+            cout << "   ref:  " << cell << endl;
+            cout << "   next: " << cell->next << " )" << endl;
+        }
+        if (cell->previous != list.first) { cout << " -------------------------- " << endl; }
+        cell = cell->previous;
+    }
+    cout << " ========================== " << endl;
 }
 
 TItem createItem(string name, char sex, int age)
@@ -99,8 +146,12 @@ int main()
     appendToList(myList, createItem());
     appendToList(myList, createItem());
     appendToList(myList, createItem());
+    prependToList(myList, createItem());
+    prependToList(myList, createItem());
 
-    showList(myList);
+    showList(myList, true);
+
+    showStack(myList, true);
 
     return 0;
 }
