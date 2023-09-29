@@ -90,7 +90,18 @@ void showList(TList list, bool debug)
     cout << " ========================== " << endl;
 }
 
-void showStack(TList list, bool debug) {
+void showItem(TCell* cell)
+{
+    cout << " ======== showItem ======== " << endl;
+    cout << "  id:   " << cell->item.id << endl;
+    cout << "  name: " << cell->item.name << endl;
+    cout << "  sex:  " << cell->item.sex << endl;
+    cout << "  age:  " << cell->item.age << endl;
+    cout << " ========================== " << endl;
+}
+
+void showStack(TList list, bool debug)
+{
     if (isEmpty(list))
     {
         cout << "The list is empty." << endl;
@@ -115,6 +126,42 @@ void showStack(TList list, bool debug) {
         cell = cell->previous;
     }
     cout << " ========================== " << endl;
+}
+
+TCell* findItem(TList &list, int key)
+{
+    if (isEmpty(list))
+    {
+        cout << "The list is empty." << endl;
+        return NULL;
+    }
+    TCell *cell = list.first->next;
+    while (cell != NULL)
+    {
+        if (cell->item.id == key)
+        {
+            return cell;
+        }
+        
+        cell = cell->next;
+    }
+    return NULL;
+}
+
+TCell* popItem(TList &list, int key)
+{
+    TCell* cell = findItem(list, key);
+    cell->next->previous = cell->previous;
+    cell->previous->next = cell->next;
+    return cell;
+}
+
+void removeItem(TList &list, int key)
+{
+    TCell* cell = findItem(list, key);
+    cell->next->previous = cell->previous;
+    cell->previous->next = cell->next;
+    delete cell;
 }
 
 TItem createItem(string name, char sex, int age)
@@ -146,12 +193,16 @@ int main()
     appendToList(myList, createItem());
     appendToList(myList, createItem());
     appendToList(myList, createItem());
-    prependToList(myList, createItem());
-    prependToList(myList, createItem());
-
-    showList(myList, true);
+    appendToList(myList, createItem());
+    appendToList(myList, createItem());
 
     showStack(myList, true);
+
+    TCell* myCell = popItem(myList, 2);
+
+    showStack(myList, true);
+
+    showItem(myCell);
 
     return 0;
 }
