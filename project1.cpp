@@ -79,7 +79,7 @@ void showList(TList list, bool debug)
         cout << "  age:  " << cell->item.age << endl;
         if (debug)
         {
-            cout << "  debug true (" << endl;
+            cout << "  debug == true (" << endl;
             cout << "   prev: " << cell->previous << endl;
             cout << "   ref:  " << cell << endl;
             cout << "   next: " << cell->next << " )" << endl;
@@ -87,16 +87,6 @@ void showList(TList list, bool debug)
         if (cell->next != NULL) { cout << " -------------------------- " << endl; }
         cell = cell->next;
     }
-    cout << " ========================== " << endl;
-}
-
-void showItem(TCell* cell)
-{
-    cout << " ======== showItem ======== " << endl;
-    cout << "  id:   " << cell->item.id << endl;
-    cout << "  name: " << cell->item.name << endl;
-    cout << "  sex:  " << cell->item.sex << endl;
-    cout << "  age:  " << cell->item.age << endl;
     cout << " ========================== " << endl;
 }
 
@@ -117,7 +107,7 @@ void showStack(TList list, bool debug)
         cout << "  age:  " << cell->item.age << endl;
         if (debug)
         {
-            cout << "  debug true (" << endl;
+            cout << "  debug == true (" << endl;
             cout << "   prev: " << cell->previous << endl;
             cout << "   ref:  " << cell << endl;
             cout << "   next: " << cell->next << " )" << endl;
@@ -125,6 +115,16 @@ void showStack(TList list, bool debug)
         if (cell->previous != list.first) { cout << " -------------------------- " << endl; }
         cell = cell->previous;
     }
+    cout << " ========================== " << endl;
+}
+
+void showItem(TCell* cell)
+{
+    cout << " ======== showItem ======== " << endl;
+    cout << "  id:   " << cell->item.id << endl;
+    cout << "  name: " << cell->item.name << endl;
+    cout << "  sex:  " << cell->item.sex << endl;
+    cout << "  age:  " << cell->item.age << endl;
     cout << " ========================== " << endl;
 }
 
@@ -148,20 +148,56 @@ TCell* findItem(TList &list, int key)
     return NULL;
 }
 
+TCell* popItem(TList &list, TCell* cell)
+{
+    if (cell->next == NULL)
+    {
+        cell->previous->next = cell->next;
+        list.last = cell->previous;
+    }
+    else
+    {
+        cell->next->previous = cell->previous;
+        cell->previous->next = cell->next;
+    }
+    return cell;
+}
+
 TCell* popItem(TList &list, int key)
 {
     TCell* cell = findItem(list, key);
-    cell->next->previous = cell->previous;
-    cell->previous->next = cell->next;
-    return cell;
+    return popItem(list, cell);
+}
+
+void removeItem(TList &list, TCell* cell)
+{
+    if (cell->next == NULL)
+    {
+        list.last = cell->previous;
+        cell->previous->next = cell->next;
+    }
+    else
+    {
+        cell->next->previous = cell->previous;
+        cell->previous->next = cell->next;
+    }
+    delete cell;
 }
 
 void removeItem(TList &list, int key)
 {
     TCell* cell = findItem(list, key);
-    cell->next->previous = cell->previous;
-    cell->previous->next = cell->next;
-    delete cell;
+    removeItem(list, cell);
+}
+
+TCell* unstackAndReturn(TList &list)
+{
+    return popItem(list, list.last);
+}
+
+void unstack(TList &list)
+{
+    removeItem(list, list.last);
 }
 
 TItem createItem(string name, char sex, int age)
@@ -187,6 +223,8 @@ TItem createItem()
 int main()
 {
     srand(time(NULL));
+
+    cout << "asdad";
 
     TList myList = createEmptyList();
 
